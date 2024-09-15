@@ -10,6 +10,7 @@ class ToDoRepository:
         self.session=session
         
     def get_todos(self)->List[ToDo]:
+        
         return list(self.session.scalars(select(ToDo)))
 
     def get_todo_by_todo_id(self,todo_id:int)->ToDo | None:

@@ -6,4 +6,3 @@ from src.main import app
 def client():
     return TestClient(app=app)
 
-
