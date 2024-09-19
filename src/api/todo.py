@@ -5,9 +5,9 @@ from src.schema.request import CreateToDoRequest
 from src.schema.respones import ToDoListSchema, ToDoSchema
 from fastapi import FastAPI,Body,HTTPException,Depends,APIRouter
 from sqlalchemy.orm import Session
-
-
-
+from src.security import get_access_token
+from src.service.user import UserService
+from src.database.repository import UserRepository
 from typing import List
 
 
@@ -17,11 +17,22 @@ router=APIRouter(prefix="/todos")
 
 @router.get("", status_code=200)
 def get_todos_handler(
+    access_token:str =Depends(get_access_token),
     order: str | None = None,
     todo_repo : ToDoRepository = Depends(ToDoRepository),
+    user_service:UserService =Depends(),
+    user_repo:UserRepository=Depends(),
 ) -> ToDoListSchema:
-
-    todos: List[Todo] = todo_repo.get_todos()
+    
+    username:str= user_service.decode_jwt(access_token=access_token)
+    user:UserRepository|None =user_repo.get_use_by_username(username=username)
+    
+    if not user:
+        raise HTTPException(status_code=404,detail="User Not Found")
+    
+    
+    
+    todos: List[Todo] = user.todos
 
     if order and order == "DESC":
         return ToDoListSchema(
