@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,EmailStr
 from typing import List
 
 class ToDoSchema(BaseModel):
@@ -14,9 +14,17 @@ class ToDoListSchema(BaseModel):
 class UserSchema(BaseModel):
     id: int
     username:str
+    email:str
+    role_id:int
+    name:str
+    phone_num:str
+    company_code:str
     class Config:
         orm_mode = True
         
         
 class JWTResponse(BaseModel):
     access_token:str
+
+class TnFResppnse(BaseModel):
+    TnF: bool 

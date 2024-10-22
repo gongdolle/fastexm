@@ -1,12 +1,26 @@
 from fastapi import APIRouter,Depends,HTTPException,BackgroundTasks
-from src.schema.request import SignUpRequest ,LogInRequest ,CreateOTPRequset,VerifyOTPRequest
+from src.schema.request import SignUpRequest ,LogInRequest ,CreateOTPRequset,VerifyOTPRequest,IdcheckRequset
 from src.service.user import UserService
 from src.database.orm import User
 from src.database.repository import UserRepository
-from src.schema.respones import UserSchema ,JWTResponse
+from src.schema.respones import UserSchema ,JWTResponse ,TnFResppnse
 from src.security import get_access_token
 from src.cache import redis_client
 router=APIRouter(prefix="/users")
+
+
+#아이디체크
+@router.post("/check-duplicate",status_code=200)
+def id_check_handler(
+    request:IdcheckRequset,
+    user_repo: UserRepository =Depends(),
+):
+    if user_repo.get_use_by_username(username=request.username)  is not None:
+        return TnFResppnse(TnF=True)
+    else:
+        return TnFResppnse(TnF=False)
+
+ 
 
 @router.post("/sign-up",status_code=201)
 def user_sign_up_handler(
@@ -22,10 +36,15 @@ def user_sign_up_handler(
     #3. user(username,hashed_password)
     user:User=User.create(
         username=request.username,
-        hashed_password=hashed_password
+        email=request.email,
+        hashed_password=hashed_password,
+        name=request.name,
+        phone_num=request.phone_num,
+        roles_id=request.roles_id,
+        company_code=request.com_num
     )
-    
-    
+        
+
     #4. user->db save
     user:User=user_repo.save_user(user=user) #id=int
     

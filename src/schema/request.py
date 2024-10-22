@@ -1,4 +1,7 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,EmailStr
+
+class IdcheckRequset(BaseModel):
+    username:str
 
 
 class CreateToDoRequest(BaseModel):
@@ -6,8 +9,15 @@ class CreateToDoRequest(BaseModel):
     is_done : bool
     
 class SignUpRequest(BaseModel):
-    username:str
-    password:str
+    username: str
+    name: str
+    phone_num: str
+    email: EmailStr
+    com_num: str
+    password: str
+  
+
+   
     
 class LogInRequest(BaseModel):
     username : str
